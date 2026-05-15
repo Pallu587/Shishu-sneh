@@ -9,6 +9,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
+/**
+ * Use case to generate growth analytics for an infant.
+ * 
+ * **Scientific Impact**: Tracking height, weight, and head circumference helps identify 
+ * early signs of stunting or malnutrition. This tool provides rural parents with 
+ * professional-grade monitoring without requiring constant hospital visits.
+ *
+ * @property repository The [GrowthRepository] used to fetch growth data entries.
+ */
 class GetGrowthChartUseCase @Inject constructor(
     private val repository: GrowthRepository
 ) {

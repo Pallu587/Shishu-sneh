@@ -8,6 +8,15 @@ data class Insight(
     val icon: String = "✨"
 )
 
+/**
+ * Use case to provide personalized, age-appropriate health insights for the infant.
+ * 
+ * **Educational Impact**: By providing proactive advice (feeding, sleep, milestones) 
+ * in the user's preferred language, the app bridges the information gap for 
+ * first-time mothers in rural settings.
+ *
+ * @constructor Creates an instance of the use case.
+ */
 class GetInsightsUseCase @Inject constructor() {
     operator fun invoke(babyAgeInWeeks: Int): List<Insight> {
         return when {
