@@ -20,26 +20,44 @@ import androidx.navigation.NavHostController
 import com.example.shishu_sneh_healthcare.presentation.navigation.Screen
 import kotlinx.coroutines.launch
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.Manifest
+import android.os.Build
+
+import androidx.compose.ui.res.stringResource
+import com.example.shishu_sneh_healthcare.R
+
 @Composable
 fun OnboardingScreen(
     navController: NavHostController,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ -> }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     val scope = rememberCoroutineScope()
     val pages = listOf(
         OnboardingPage(
-            title = "Track Your Baby's Growth",
-            description = "Monitor weight, height and head circumference with easy-to-read charts.",
+            title = stringResource(R.string.track_growth),
+            description = stringResource(R.string.track_growth_desc),
             icon = "📈"
         ),
         OnboardingPage(
-            title = "Never Miss a Vaccine",
-            description = "Get timely reminders for your baby's vaccination schedule.",
+            title = stringResource(R.string.never_miss_vaccine),
+            description = stringResource(R.string.never_miss_vaccine_desc),
             icon = "💉"
         ),
         OnboardingPage(
-            title = "Expert Tips, Every Week",
-            description = "Receive age-appropriate feeding guides and developmental milestone alerts.",
+            title = stringResource(R.string.expert_tips),
+            description = stringResource(R.string.expert_tips_desc),
             icon = "🤱"
         )
     )
@@ -58,7 +76,7 @@ fun OnboardingScreen(
                     popUpTo(Screen.Onboarding.route) { inclusive = true } 
                 }
             }) {
-                Text(text = "Skip", color = MaterialTheme.colorScheme.primary)
+                Text(text = stringResource(R.string.skip), color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -166,7 +184,7 @@ fun NavigationButtons(
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = "Next", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.next), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         } else {
             Button(
@@ -175,7 +193,7 @@ fun NavigationButtons(
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = "Get Started", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.get_started), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         }
     }

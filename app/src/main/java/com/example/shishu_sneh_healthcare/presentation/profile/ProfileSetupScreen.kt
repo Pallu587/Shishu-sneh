@@ -15,6 +15,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.shishu_sneh_healthcare.data.local.entity.BabyEntity
 import com.example.shishu_sneh_healthcare.presentation.navigation.Screen
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+import com.example.shishu_sneh_healthcare.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,9 +37,11 @@ fun ProfileSetupScreen(
     var babyGender by remember { mutableStateOf("Girl") }
 
     Scaffold(
+        containerColor = WarmWhite,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Setup Profile", fontWeight = FontWeight.Bold) }
+                title = { Text("Setup Profile", fontWeight = FontWeight.Bold, color = TextPrimary) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = WarmWhite)
             )
         }
     ) { padding ->
@@ -49,7 +55,9 @@ fun ProfileSetupScreen(
             LinearProgressIndicator(
                 progress = { step.toFloat() / 2f },
                 modifier = Modifier.fillMaxWidth().height(8.dp),
-                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+                color = SoftPink,
+                trackColor = SoftPink.copy(alpha = 0.1f)
             )
             
             Spacer(modifier = Modifier.height(32.dp))
@@ -70,9 +78,16 @@ fun ProfileSetupScreen(
                         babyGender = babyGender,
                         onGenderChange = { babyGender = it },
                         onFinish = {
+                            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val dobMillis = try {
+                                sdf.parse(babyDob)?.time ?: System.currentTimeMillis()
+                            } catch (e: Exception) {
+                                System.currentTimeMillis()
+                            }
+                            
                             val baby = BabyEntity(
                                 name = babyName,
-                                dob = 0L, // Logic to parse date would go here
+                                dob = dobMillis,
                                 gender = babyGender,
                                 bloodGroup = "O+",
                                 birthWeight = 3.2,
@@ -100,22 +115,24 @@ fun ProfileSetupScreen(
 @Composable
 fun ParentInfoStep(motherName: String, onNameChange: (String) -> Unit, onNext: () -> Unit) {
     Column {
-        Text(text = "Step 1: Guardian Info", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-        Text(text = "Help us personalize your experience", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = "Step 1: Guardian Info", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
+        Text(text = "Help us personalize your experience", color = TextSecondary)
         Spacer(modifier = Modifier.height(32.dp))
         OutlinedTextField(
             value = motherName,
             onValueChange = onNameChange,
             label = { Text("Mother / Guardian Name") },
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large
+            shape = MaterialTheme.shapes.large,
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = ButtonCTA)
         )
         Spacer(modifier = Modifier.height(48.dp))
         Button(
             onClick = onNext,
             enabled = motherName.isNotEmpty(),
             modifier = Modifier.fillMaxWidth().height(60.dp),
-            shape = MaterialTheme.shapes.large
+            shape = MaterialTheme.shapes.large,
+            colors = ButtonDefaults.buttonColors(containerColor = ButtonCTA)
         ) {
             Text("Next: Baby Details", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
@@ -134,15 +151,16 @@ fun BabyInfoStep(
     onBack: () -> Unit
 ) {
     Column {
-        Text(text = "Step 2: Baby Info", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-        Text(text = "Tell us about your little one", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = "Step 2: Baby Info", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
+        Text(text = "Tell us about your little one", color = TextSecondary)
         Spacer(modifier = Modifier.height(32.dp))
         OutlinedTextField(
             value = babyName,
             onValueChange = onBabyNameChange,
-            label = { Text("Baby's Name") },
+            label = { Text("Baby\'s Name") },
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large
+            shape = MaterialTheme.shapes.large,
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = ButtonCTA)
         )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
@@ -151,27 +169,37 @@ fun BabyInfoStep(
             label = { Text("Date of Birth (DD/MM/YYYY)") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            shape = MaterialTheme.shapes.large
+            shape = MaterialTheme.shapes.large,
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = ButtonCTA)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(selected = babyGender == "Boy", onClick = { onGenderChange("Boy") })
-            Text("Boy")
+            RadioButton(
+                selected = babyGender == "Boy", 
+                onClick = { onGenderChange("Boy") },
+                colors = RadioButtonDefaults.colors(selectedColor = ButtonCTA)
+            )
+            Text("Boy", color = TextPrimary)
             Spacer(modifier = Modifier.width(16.dp))
-            RadioButton(selected = babyGender == "Girl", onClick = { onGenderChange("Girl") })
-            Text("Girl")
+            RadioButton(
+                selected = babyGender == "Girl", 
+                onClick = { onGenderChange("Girl") },
+                colors = RadioButtonDefaults.colors(selectedColor = ButtonCTA)
+            )
+            Text("Girl", color = TextPrimary)
         }
         Spacer(modifier = Modifier.height(48.dp))
         Button(
             onClick = onFinish,
             enabled = babyName.isNotEmpty() && babyDob.isNotEmpty(),
             modifier = Modifier.fillMaxWidth().height(60.dp),
-            shape = MaterialTheme.shapes.large
+            shape = MaterialTheme.shapes.large,
+            colors = ButtonDefaults.buttonColors(containerColor = ButtonCTA)
         ) {
             Text("Complete Setup", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
         TextButton(onClick = onBack, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-            Text("Go Back", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Go Back", color = TextSecondary)
         }
     }
 }

@@ -14,8 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.shishu_sneh_healthcare.ui.theme.LavenderHeader
-import com.example.shishu_sneh_healthcare.ui.theme.PinkHeader
+import com.example.shishu_sneh_healthcare.ui.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
@@ -29,7 +28,7 @@ fun SplashScreen(
     LaunchedEffect(key1 = startDestination) {
         startAnimation = true
         if (startDestination != null) {
-            delay(1500) // Reduced from 3000ms for faster start
+            delay(1500)
             navController.popBackStack()
             navController.navigate(startDestination!!)
         }
@@ -40,7 +39,7 @@ fun SplashScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(PinkHeader, LavenderHeader)
+                    colors = listOf(SoftPink, SoftLavender)
                 )
             ),
         contentAlignment = Alignment.Center
@@ -53,7 +52,7 @@ fun SplashScreen(
                 Surface(
                     modifier = Modifier.size(120.dp),
                     shape = MaterialTheme.shapes.extraLarge,
-                    color = Color.White.copy(alpha = 0.2f)
+                    color = Color.White.copy(alpha = 0.3f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Text(text = "👶", fontSize = 64.sp)
@@ -62,14 +61,14 @@ fun SplashScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = "Shishu-Sneh",
-                    fontSize = 40.sp,
+                    fontSize = 44.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
+                    color = TextPrimary
                 )
                 Text(
-                    text = "Your Baby's Guardian Angel",
+                    text = "Your Baby\'s Guardian Angel",
                     fontSize = 16.sp,
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = TextPrimary.copy(alpha = 0.7f),
                     fontWeight = FontWeight.Medium
                 )
             }

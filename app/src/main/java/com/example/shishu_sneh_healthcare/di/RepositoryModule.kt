@@ -56,6 +56,18 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
+    abstract fun bindSleepRepository(
+        sleepRepositoryImpl: SleepRepositoryImpl
+    ): SleepRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDiaperRepository(
+        diaperRepositoryImpl: DiaperRepositoryImpl
+    ): DiaperRepository
+
+    @Binds
+    @Singleton
     abstract fun bindAuthRepository(
         authRepositoryImpl: AuthRepositoryImpl
     ): AuthRepository

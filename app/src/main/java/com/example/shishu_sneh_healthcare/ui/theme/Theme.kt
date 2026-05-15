@@ -11,6 +11,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.compose.ui.unit.dp
+
+object AppDimensions {
+    val PaddingSmall = 8.dp
+    val PaddingMedium = 16.dp
+    val PaddingLarge = 24.dp
+    val CardCornerRadius = 24.dp
+}
 
 private val DarkColorScheme = darkColorScheme(
     primary = SoftPink,

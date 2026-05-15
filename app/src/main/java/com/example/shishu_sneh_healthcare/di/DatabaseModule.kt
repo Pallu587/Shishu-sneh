@@ -32,6 +32,7 @@ object DatabaseModule {
             "shishu_sneh.db"
         )
             .openHelperFactory(factory)
+            .fallbackToDestructiveMigration()
             .setJournalMode(androidx.room.RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
             .build()
     }
@@ -62,4 +63,10 @@ object DatabaseModule {
 
     @Provides
     fun provideNotificationDao(db: AppDatabase): NotificationDao = db.notificationDao()
+
+    @Provides
+    fun provideSleepDao(db: AppDatabase): SleepDao = db.sleepDao()
+
+    @Provides
+    fun provideDiaperDao(db: AppDatabase): DiaperDao = db.diaperDao()
 }

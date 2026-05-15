@@ -29,6 +29,7 @@ fun HealthRecordsScreen(
     viewModel: HealthRecordsViewModel = hiltViewModel()
 ) {
     val records by viewModel.records.collectAsState()
+    var showAddDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = babyId) {
         viewModel.loadRecords(babyId)
@@ -46,7 +47,7 @@ fun HealthRecordsScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Open add record dialog */ }) {
+            FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Record")
             }
         }
@@ -78,6 +79,75 @@ fun HealthRecordsScreen(
             }
         }
     }
+
+    if (showAddDialog) {
+        AddRecordDialog(
+            onDismiss = { showAddDialog = false },
+            onConfirm = { type, doctor, notes ->
+                viewModel.addRecord(
+                    HealthRecordEntity(
+                        babyId = babyId,
+                        type = type,
+                        date = System.currentTimeMillis(),
+                        doctorName = doctor,
+                        clinic = null,
+                        notes = notes,
+                        attachmentUri = null
+                    )
+                )
+                showAddDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+fun AddRecordDialog(onDismiss: () -> Unit, onConfirm: (String, String, String) -> Unit) {
+    var type by remember { mutableStateOf("") }
+    var doctor by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Health Record") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = type,
+                    onValueChange = { type = it },
+                    label = { Text("Record Type (e.g., Fever, Checkup)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = doctor,
+                    onValueChange = { doctor = it },
+                    label = { Text("Doctor Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    label = { Text("Notes") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { if (type.isNotEmpty()) onConfirm(type, doctor, notes) },
+                enabled = type.isNotEmpty()
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Composable

@@ -18,9 +18,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
+import com.example.shishu_sneh_healthcare.ui.theme.*
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavHostController, onBackClick: () -> Unit) {
+fun ProfileScreen(
+    navController: NavHostController, 
+    onBackClick: () -> Unit,
+    viewModel: ProfileViewModel = hiltViewModel()
+) {
+    val babyProfile by viewModel.babyProfile.collectAsState()
+    val stats by viewModel.stats.collectAsState()
+    
+    val ageWeeks = babyProfile?.let { 
+        ((System.currentTimeMillis() - it.dob) / (1000 * 60 * 60 * 24 * 7)).toInt()
+    } ?: 0
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -44,7 +60,7 @@ fun ProfileScreen(navController: NavHostController, onBackClick: () -> Unit) {
             Surface(
                 modifier = Modifier.size(120.dp),
                 shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(text = "👩", fontSize = 60.sp)
@@ -62,24 +78,39 @@ fun ProfileScreen(navController: NavHostController, onBackClick: () -> Unit) {
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            Text(text = "Ananya's Mom", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-            Text(text = "Mother • Bengaluru", color = Color.Gray)
+            Text(
+                text = babyProfile?.motherName ?: "Guardian", 
+                fontSize = 24.sp, 
+                fontWeight = FontWeight.ExtraBold,
+                color = TextPrimary
+            )
+            Text(
+                text = "Mother of ${babyProfile?.name ?: "Baby"}", 
+                color = TextSecondary
+            )
             
             Spacer(modifier = Modifier.height(32.dp))
             
-            ProfileStatRow()
+            ProfileStatRow(
+                vaccines = stats.vaccinesDone.toString(),
+                weeks = ageWeeks.toString(),
+                milestones = stats.milestonesDone.toString()
+            )
             
             Spacer(modifier = Modifier.height(32.dp))
             
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    ProfileItem("Email", "mom@example.com")
+                    ProfileItem("Baby\'s Name", babyProfile?.name ?: "Not Set")
                     Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.3f))
-                    ProfileItem("Phone", "+91 9876543210")
+                    ProfileItem("Location", "Bengaluru, Karnataka")
+                    Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.3f))
+                    ProfileItem("Language", "English / Kannada")
                 }
             }
         }
@@ -87,11 +118,11 @@ fun ProfileScreen(navController: NavHostController, onBackClick: () -> Unit) {
 }
 
 @Composable
-fun ProfileStatRow() {
+fun ProfileStatRow(vaccines: String, weeks: String, milestones: String) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        StatItem("4", "Vaccines")
-        StatItem("12", "Weeks")
-        StatItem("8", "Milestones")
+        StatItem(vaccines, "Vaccines")
+        StatItem(weeks, "Weeks")
+        StatItem(milestones, "Milestones")
     }
 }
 

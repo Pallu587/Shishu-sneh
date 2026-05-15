@@ -21,6 +21,11 @@ import com.example.shishu_sneh_healthcare.data.local.entity.VaccineEntity
 import java.text.SimpleDateFormat
 import java.util.*
 
+import androidx.compose.foundation.shape.CircleShape
+import com.example.shishu_sneh_healthcare.ui.theme.*
+
+import androidx.compose.foundation.lazy.itemsIndexed
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VaccinationScreen(
@@ -35,6 +40,7 @@ fun VaccinationScreen(
     }
 
     Scaffold(
+        containerColor = WarmWhite,
         topBar = {
             TopAppBar(
                 title = { Text("Immunization Calendar", fontWeight = FontWeight.Bold) },
@@ -43,7 +49,7 @@ fun VaccinationScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmWhite)
             )
         }
     ) { padding ->
@@ -51,30 +57,76 @@ fun VaccinationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 24.dp)
         ) {
             Text(
-                text = "Track your baby's protection",
+                text = "Track your baby\'s protection",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = TextSecondary
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 24.dp)
-            ) {
-                items(vaccines) { vaccine ->
-                    VaccineCard(vaccine = vaccine)
-                }
-                
-                if (vaccines.isEmpty()) {
-                    item {
-                        EmptyVaccineState()
+            if (vaccines.isEmpty()) {
+                EmptyVaccineState()
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(bottom = 24.dp)
+                ) {
+                    itemsIndexed(vaccines) { index, vaccine ->
+                        VaccineTimelineItem(
+                            vaccine = vaccine,
+                            isLast = index == vaccines.size - 1
+                        )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun VaccineTimelineItem(vaccine: VaccineEntity, isLast: Boolean) {
+    val statusColor = when (vaccine.status) {
+        "Done" -> MintGreen
+        "Overdue" -> SoftRed
+        "Due Today" -> PeachWarning
+        else -> Color.LightGray.copy(alpha = 0.5f)
+    }
+
+    val icon = when (vaccine.status) {
+        "Done" -> "✅"
+        "Upcoming", "Due Today" -> "🟡"
+        else -> "⚪"
+    }
+
+    Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(48.dp)
+        ) {
+            Surface(
+                color = statusColor,
+                shape = CircleShape,
+                modifier = Modifier.size(24.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(text = icon, fontSize = 12.sp)
+                }
+            }
+            if (!isLast) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(2.dp)
+                        .background(Color.LightGray.copy(alpha = 0.3f))
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Column(modifier = Modifier.padding(bottom = 24.dp)) {
+            VaccineCard(vaccine = vaccine)
         }
     }
 }
@@ -85,43 +137,43 @@ fun VaccineCard(vaccine: VaccineEntity) {
     val dueDate = dateFormat.format(Date(vaccine.scheduledDate))
 
     val statusColor = when (vaccine.status) {
-        "Done" -> Color(0xFF4CAF50)
-        "Overdue" -> MaterialTheme.colorScheme.error
-        "Due Today" -> Color(0xFFFF9800)
-        else -> MaterialTheme.colorScheme.primary
+        "Done" -> MintGreen
+        "Overdue" -> SoftRed
+        "Due Today" -> PeachWarning
+        else -> SoftLavender
     }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(AppDimensions.CardCornerRadius),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                color = statusColor.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(16.dp),
+                color = statusColor.copy(alpha = 0.3f),
+                shape = CircleShape,
                 modifier = Modifier.size(56.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = if (vaccine.status == "Done") Icons.Default.CheckCircle else Icons.Default.CheckCircle, // Placeholder for specific vaccine icon
+                        imageVector = if (vaccine.status == "Done") Icons.Default.CheckCircle else Icons.Default.CheckCircle, 
                         contentDescription = null,
-                        tint = statusColor,
+                        tint = TextPrimary,
                         modifier = Modifier.size(28.dp)
                     )
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = vaccine.name, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                Text(text = vaccine.disease, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = vaccine.name, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = TextPrimary)
+                Text(text = vaccine.disease, fontSize = 13.sp, color = TextSecondary)
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Due: $dueDate", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                    Text(text = "Due: $dueDate", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = TextPrimary)
                 }
             }
             StatusChip(status = vaccine.status, color = statusColor)
@@ -132,14 +184,13 @@ fun VaccineCard(vaccine: VaccineEntity) {
 @Composable
 fun StatusChip(status: String, color: Color) {
     Surface(
-        color = color.copy(alpha = 0.1f),
-        shape = RoundedCornerShape(8.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.5f))
+        color = color.copy(alpha = 0.4f),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Text(
             text = status,
-            color = color,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            color = TextPrimary,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold
         )
@@ -150,9 +201,10 @@ fun StatusChip(status: String, color: Color) {
 fun EmptyVaccineState() {
     Box(modifier = Modifier.fillMaxSize().padding(top = 100.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "💉", fontSize = 60.sp)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "No vaccines scheduled yet", fontWeight = FontWeight.Bold, color = Color.Gray)
+            Text(text = "💉", fontSize = 80.sp)
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(text = "No vaccines due today", fontWeight = FontWeight.Bold, color = TextPrimary, fontSize = 18.sp)
+            Text(text = "All protections up to date", fontSize = 14.sp, color = TextSecondary)
         }
     }
 }

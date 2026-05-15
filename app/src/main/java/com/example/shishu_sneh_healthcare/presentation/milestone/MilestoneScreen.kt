@@ -18,6 +18,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shishu_sneh_healthcare.data.local.entity.MilestoneEntity
 
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.example.shishu_sneh_healthcare.ui.theme.*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MilestoneScreen(
@@ -32,6 +36,7 @@ fun MilestoneScreen(
     }
 
     Scaffold(
+        containerColor = WarmWhite,
         topBar = {
             TopAppBar(
                 title = { Text("Milestones", fontWeight = FontWeight.Bold) },
@@ -39,7 +44,8 @@ fun MilestoneScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmWhite)
             )
         }
     ) { padding ->
@@ -47,15 +53,22 @@ fun MilestoneScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp)
+                .padding(24.dp)
         ) {
             val progress = if (milestones.isNotEmpty()) {
                 milestones.count { it.status == "Yes" }.toFloat() / milestones.size
-            } else 0.4f // Default 40% for visual professional feel if empty
+            } else 0.4f
             
-            MilestoneProgressBar(progress = progress)
+            MilestoneCircularProgress(progress = progress)
             
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Developmental Checklist",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -85,31 +98,41 @@ fun MilestoneScreen(
 }
 
 @Composable
-fun MilestoneProgressBar(progress: Float) {
+fun MilestoneCircularProgress(progress: Float) {
     val animatedProgress by animateFloatAsState(targetValue = progress)
     
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(AppDimensions.CardCornerRadius),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Overall Development", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                Text(text = "${(progress * 100).toInt()}%", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        Row(
+            modifier = Modifier.padding(24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Development Progress", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Text(text = "Your baby is reaching great milestones!", fontSize = 12.sp, color = TextSecondary)
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            LinearProgressIndicator(
-                progress = { animatedProgress },
-                modifier = Modifier.fillMaxWidth().height(10.dp),
-                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-            )
+            
+            Box(contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier.size(70.dp),
+                    color = SoftPink,
+                    strokeWidth = 8.dp,
+                    trackColor = SoftPink.copy(alpha = 0.1f),
+                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                )
+                Text(
+                    text = "${(progress * 100).toInt()}%",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 16.sp,
+                    color = TextPrimary
+                )
+            }
         }
     }
 }
@@ -118,35 +141,36 @@ fun MilestoneProgressBar(progress: Float) {
 fun MilestoneItem(milestone: MilestoneEntity, onToggle: (MilestoneEntity) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(AppDimensions.CardCornerRadius),
         colors = CardDefaults.cardColors(
-            containerColor = if (milestone.status == "Yes") Color(0xFFE8F5E9) else MaterialTheme.colorScheme.surface
+            containerColor = if (milestone.status == "Yes") Color(0xFFE8F5E9).copy(alpha = 0.5f) else Color.White
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                color = if (milestone.status == "Yes") Color(0xFF4CAF50).copy(alpha = 0.2f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                shape = androidx.compose.foundation.shape.CircleShape,
+                color = if (milestone.status == "Yes") MintGreen.copy(alpha = 0.4f) else SoftLavender.copy(alpha = 0.3f),
+                shape = CircleShape,
                 modifier = Modifier.size(40.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(text = "${milestone.month}", fontWeight = FontWeight.Bold, color = if (milestone.status == "Yes") Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary)
+                    Text(text = "${milestone.month}", fontWeight = FontWeight.Bold, color = TextPrimary)
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Month ${milestone.month} Milestone", fontSize = 12.sp, color = Color.Gray)
-                Text(text = milestone.description, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text(text = "Month ${milestone.month}", fontSize = 12.sp, color = TextSecondary)
+                Text(text = milestone.description, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = TextPrimary)
             }
             Checkbox(
                 checked = milestone.status == "Yes",
                 onCheckedChange = { isChecked ->
                     onToggle(milestone.copy(status = if (isChecked) "Yes" else "No"))
-                }
+                },
+                colors = CheckboxDefaults.colors(checkedColor = MintGreen, uncheckedColor = TextSecondary)
             )
         }
     }

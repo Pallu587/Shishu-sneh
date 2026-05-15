@@ -28,6 +28,7 @@ fun MedicationScreen(
     viewModel: MedicationViewModel = hiltViewModel()
 ) {
     val medications by viewModel.medications.collectAsState()
+    var showAddDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = babyId) {
         viewModel.loadMedications(babyId)
@@ -45,7 +46,7 @@ fun MedicationScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Add Medication */ }) {
+            FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
@@ -77,6 +78,80 @@ fun MedicationScreen(
             }
         }
     }
+
+    if (showAddDialog) {
+        AddMedicationDialog(
+            onDismiss = { showAddDialog = false },
+            onConfirm = { name, dose, frequency ->
+                viewModel.addMedication(
+                    MedicationEntity(
+                        babyId = babyId,
+                        name = name,
+                        dose = dose,
+                        frequency = frequency,
+                        startDate = System.currentTimeMillis(),
+                        endDate = null,
+                        notes = ""
+                    )
+                )
+                showAddDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+fun AddMedicationDialog(onDismiss: () -> Unit, onConfirm: (String, String, String) -> Unit) {
+    var name by remember { mutableStateOf("") }
+    var dose by remember { mutableStateOf("") }
+    var frequency by remember { mutableStateOf("Once Daily") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Medication") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Medicine Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = dose,
+                    onValueChange = { dose = it },
+                    label = { Text("Dose (e.g., 5ml, 1 drop)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Frequency", style = MaterialTheme.typography.labelMedium)
+                val frequencies = listOf("Once Daily", "Twice Daily", "Thrice Daily")
+                frequencies.forEach { freq ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        RadioButton(selected = frequency == freq, onClick = { frequency = freq })
+                        Text(text = freq)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { if (name.isNotEmpty()) onConfirm(name, dose, frequency) },
+                enabled = name.isNotEmpty()
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Composable

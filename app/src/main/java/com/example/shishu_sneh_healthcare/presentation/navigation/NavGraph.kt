@@ -19,6 +19,9 @@ import com.example.shishu_sneh_healthcare.presentation.profile.ProfileScreen
 import com.example.shishu_sneh_healthcare.presentation.profile.ProfileSetupScreen
 import com.example.shishu_sneh_healthcare.presentation.records.HealthRecordsScreen
 import com.example.shishu_sneh_healthcare.presentation.settings.SettingsScreen
+import com.example.shishu_sneh_healthcare.presentation.chat.ChatScreen
+import com.example.shishu_sneh_healthcare.presentation.diaper.DiaperScreen
+import com.example.shishu_sneh_healthcare.presentation.sleep.SleepScreen
 import com.example.shishu_sneh_healthcare.presentation.splash.SplashScreen
 import com.example.shishu_sneh_healthcare.presentation.vaccine.VaccinationScreen
 
@@ -91,6 +94,23 @@ fun SetupNavGraph(
         ) { backStackEntry ->
             val babyId = backStackEntry.arguments?.getLong("babyId") ?: -1L
             MedicationScreen(babyId = babyId, onBackClick = { navController.popBackStack() })
+        }
+        composable(
+            route = Screen.Sleep.route + "/{babyId}",
+            arguments = listOf(navArgument("babyId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val babyId = backStackEntry.arguments?.getLong("babyId") ?: -1L
+            SleepScreen(babyId = babyId, onBackClick = { navController.popBackStack() })
+        }
+        composable(
+            route = Screen.Diaper.route + "/{babyId}",
+            arguments = listOf(navArgument("babyId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val babyId = backStackEntry.arguments?.getLong("babyId") ?: -1L
+            DiaperScreen(babyId = babyId, onBackClick = { navController.popBackStack() })
+        }
+        composable(route = Screen.Chat.route) {
+            ChatScreen(onBackClick = { navController.popBackStack() })
         }
         composable(route = Screen.Settings.route) {
             SettingsScreen(navController = navController, onBackClick = { navController.popBackStack() })
