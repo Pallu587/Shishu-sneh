@@ -105,9 +105,9 @@ Powered by **Google Gemini Pro**, Sneh AI acts as a 24/7 pediatric assistant:
 
 ---
 
-## 👨‍💻 Developed By
-**Eshaan P.M**
+## 👩‍💻 Developed By
+**Pallavi Premanand Asnotikar**
 *Engineering with a Social Conscience.*
 
 [![GitHub](https://img.shields.io/badge/GitHub-Profile-black?logo=github)](https://github.com/Pallu587)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/eshaan-pm/)
+
